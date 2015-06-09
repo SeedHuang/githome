@@ -1,4 +1,7 @@
-//this is test method
+/**
+@file nirvana is light weight javascript framework, and it's been used in video module of baidubrowser.
+@author Seedhuang   
+*/
 ! function() {
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(context) {
@@ -247,8 +250,12 @@ var require, define;
 
 })(this);
 
-;
+
 define('nv:api', function(require, exports, module) {
+    /**
+    @module nv:api
+    */
+
     //Web接口堆栈
     var WebAPIList = {};
     //客户端默认接口
@@ -294,8 +301,18 @@ define('nv:api', function(require, exports, module) {
     }
 
     var api = {
-        //Web接口管理
+        /**
+        Web接口管理
+        * @memberof nv:api
+        */
         web: {
+            /**
+            regster method
+            
+            * @param {string} name - method name
+            * @param {function} behavior - the method to register
+            * @returns {context} the scope of the method
+            */
             register: function(name, behavior) {
                 register.call(WebAPIList, name, behavior);
                 return this;
@@ -320,7 +337,7 @@ define('nv:api', function(require, exports, module) {
         }
     };
     module.exports = api;
-});;
+});
 define('nv:app', function(require, exports, module) {
     var queue = [];
     var slice = queue.slice;
