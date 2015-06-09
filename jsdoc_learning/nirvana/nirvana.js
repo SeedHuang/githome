@@ -1,10 +1,11 @@
-!function(){
+! function() {
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(context) {
             var slice = [].slice,
                 args = slice.call(arguments, 1),
                 self = this,
-                nop = function() {}, bound = function() {
+                nop = function() {},
+                bound = function() {
                     return self.apply(this instanceof nop ? this : (context || {}),
                         args.concat(slice.call(arguments)));
                 };
@@ -14,13 +15,7 @@
         };
     }
 }();
-;/**
- * file: mod.js
- * ver: 1.0.6
- * update: 2014/1/15
- *
- * https://github.com/zjcqoo/mod
- */
+
 var require, define;
 
 (function(global) {
@@ -81,18 +76,31 @@ var require, define;
         });
     }
 
+    /**
+    Metod of define module
+    * @global
+    * @constructor
+    * @param {string} id - module id
+    * @param {callback} factory - the call is used to make a module
+    */
     define = function(id, factory) {
         factoryMap[id] = factory;
 
         var queue = loadingMap[id];
         if (queue) {
-            for(var i = 0, n = queue.length; i < n; i++) {
+            for (var i = 0, n = queue.length; i < n; i++) {
                 queue[i]();
             }
             delete loadingMap[id];
         }
     };
 
+    /**
+    Method of include a module
+    * @global
+    * @constructor
+    * @param {string} id - module id
+    */
     require = function(id) {
         id = require.alias(id);
 
@@ -116,9 +124,7 @@ var require, define;
         //
         // factory: function OR value
         //
-        var ret = (typeof factory == 'function')
-                ? factory.apply(mod, [require, mod.exports, mod])
-                : factory;
+        var ret = (typeof factory == 'function') ? factory.apply(mod, [require, mod.exports, mod]) : factory;
 
         if (ret) {
             mod.exports = ret;
@@ -126,12 +132,19 @@ var require, define;
         return mod.exports;
     };
 
+    /**
+    async load the model
+    * @function require.async
+    * @param {array} names - modoules' names
+    * @param {callback} onload - callback of onload
+    * @param {callback} onload - callback of onerror
+    */
     require.async = function(names, onload, onerror) {
         if (typeof names == 'string') {
             names = [names];
         }
-        
-        for(var i = 0, n = names.length; i < n; i++) {
+
+        for (var i = 0, n = names.length; i < n; i++) {
             names[i] = require.alias(names[i]);
         }
 
@@ -139,7 +152,7 @@ var require, define;
         var needNum = 0;
 
         function findNeed(depArr) {
-            for(var i = 0, n = depArr.length; i < n; i++) {
+            for (var i = 0, n = depArr.length; i < n; i++) {
                 //
                 // skip loading or loaded
                 //
@@ -149,7 +162,7 @@ var require, define;
                 if (child && 'deps' in child) {
                     findNeed(child.deps);
                 }
-                
+
                 if (dep in factoryMap || dep in needMap) {
                     continue;
                 }
@@ -163,14 +176,14 @@ var require, define;
         function updateNeed() {
             if (0 == needNum--) {
                 var args = [];
-                for(var i = 0, n = names.length; i < n; i++) {
+                for (var i = 0, n = names.length; i < n; i++) {
                     args[i] = require(names[i]);
                 }
 
                 onload && onload.apply(global, args);
             }
         }
-        
+
         findNeed(names);
         updateNeed();
     };
@@ -180,23 +193,21 @@ var require, define;
 
         // merge `res` & `pkg` fields
         col = obj.res;
-        for(k in col) {
+        for (k in col) {
             if (col.hasOwnProperty(k)) {
                 resMap[k] = col[k];
             }
         }
 
         col = obj.pkg;
-        for(k in col) {
+        for (k in col) {
             if (col.hasOwnProperty(k)) {
                 pkgMap[k] = col[k];
             }
         }
     };
 
-    /**
-    @memberof
-    */
+
     require.loadJs = function(url) {
         createScript(url);
     };
@@ -205,15 +216,14 @@ var require, define;
         if (cfg.content) {
             var sty = document.createElement('style');
             sty.type = 'text/css';
-            
-            if (sty.styleSheet) {       // IE
+
+            if (sty.styleSheet) { // IE
                 sty.styleSheet.cssText = cfg.content;
             } else {
                 sty.innerHTML = cfg.content;
             }
             head.appendChild(sty);
-        }
-        else if (cfg.url) {
+        } else if (cfg.url) {
             var link = document.createElement('link');
             link.href = cfg.url;
             link.rel = 'stylesheet';
@@ -223,7 +233,9 @@ var require, define;
     };
 
 
-    require.alias = function(id) {return id};
+    require.alias = function(id) {
+        return id
+    };
 
     require.timeout = 5000;
 
@@ -234,21 +246,22 @@ var require, define;
 
 })(this);
 
-;define('nv:api', function(require, exports, module) {
+;
+define('nv:api', function(require, exports, module) {
     //Web接口堆栈
     var WebAPIList = {};
     //客户端默认接口
-    var ClientInterface = function(json){
+    var ClientInterface = function(json) {
         try {
             return window.__bdcapi__.onWebEvent(JSON.stringify(json));
-        }catch(e){
+        } catch (e) {
             return null;
         }
-        
+
     };
     //Web开放接口
     window.__bdwapi__ = {
-        onClientEvent: function(json) {//onNativeEvent onClientEvent
+        onClientEvent: function(json) { //onNativeEvent onClientEvent
             if (typeof json === 'string') {
                 json = JSON.parse(json);
                 var item = WebAPIList[json.action];
@@ -306,8 +319,8 @@ var require, define;
         }
     };
     module.exports = api;
-});
-;define('nv:app', function (require, exports, module) {
+});;
+define('nv:app', function(require, exports, module) {
     var queue = [];
     var slice = queue.slice;
     var app = Object.defineProperties({
@@ -319,14 +332,14 @@ var require, define;
             configurable: false
         },
         get: {
-            value: function (name) {
+            value: function(name) {
                 return this[name] || (this[name] = {});
             },
             enumerable: false,
             configurable: false
         },
         push: {
-            value: function () {
+            value: function() {
                 queue.push.apply(queue, slice.call(arguments, 0));
                 return this;
             },
@@ -334,7 +347,7 @@ var require, define;
             configurable: false
         },
         run: {
-            value: function (fn) {
+            value: function(fn) {
                 if ($.isFunction(fn)) {
                     fn.apply(this, slice.call(arguments, 1));
                 } else if ($.isArray(fn)) {
@@ -350,8 +363,8 @@ var require, define;
         }
     });
     module.exports = app;
-});
-;define('nv:cache', function(require, exports, module) {
+});;
+define('nv:cache', function(require, exports, module) {
     var CacheList = {};
     var defaultStorage = window.localStorage;
     var emptyFunction = function() {};
@@ -434,14 +447,14 @@ var require, define;
                             url: config.remote,
                             data: currentParams,
                             traditional: true,
-                            timeout:8000,
+                            timeout: 8000,
                             dataType: 'jsonp',
                             success: function(data) {
                                 //数据预处理
-                                if($.isFunction(config.behavior)){
+                                if ($.isFunction(config.behavior)) {
                                     data = config.behavior(data);
                                 }
-                                if(!data) {
+                                if (!data) {
                                     //网络出错使用过期数据
                                     if (cacheData) {
                                         deferred.resolve(cacheData);
@@ -450,14 +463,14 @@ var require, define;
                                         deferred.reject();
                                     }
                                     return;
-                                }else if(data.errno){
+                                } else if (data.errno) {
                                     deferred.reject(data.errno);
                                     return;
-                                }else if(!data.data){
+                                } else if (!data.data) {
                                     deferred.reject(999);
                                     return;
                                 }
-                                
+
                                 //时间戳
                                 data._time = date.toString(32);
                                 //缓存
@@ -484,8 +497,8 @@ var require, define;
         }
     };
     module.exports = cache;
-});
-;define('nv:directive', function(require, exports, module) {
+});;
+define('nv:directive', function(require, exports, module) {
     var DirectiveList = {};
     var emptyFunction = function() {};
     //废弃
@@ -582,8 +595,8 @@ var require, define;
         }
     }]);
     module.exports = directive;
-});
-;define('nv:router', function(require, exports, module) {
+});;
+define('nv:router', function(require, exports, module) {
     var init = false;
     var routes = [];
     var otherRoute = {};
@@ -610,52 +623,52 @@ var require, define;
         });
         return result;
     }
-	
-	var _maxId = (+new Date),
-		logurl = 'http://r2.mo.baidu.com/stat/rec.php?ver=2';
-	if (location.hostname != 'm.baidu.com') {
-		logurl = 'http://shahe.baidu.com/stat/rec.php?ver=2';
-	}
-	
-	var comVersion = function(a, b){
-		a = a.split(".");
-		b = b.split(".");
-		var i = 0;
-		for(i=0;i<a.length;++i){
-			if(parseInt(a[i]) > (parseInt(b[i]) || 0)){
-				return true;
-			}else if(parseInt(a[i]) < (parseInt(b[i]) || 0)){
-				return false;
-			}
-		}
-		for(;i<b.length;++i){
-			if(parseInt(b[i]) > 0){
-				return false;
-			}
-		}
-		return true;
-	};
-		
-	var jsonp = function(src, cb, err) {
-		var id = "test" + (++_maxId);
-		if(src.indexOf("?") != -1){
-			src += "&callback=" + id;
-		}else{
-			src += "?callback=" + id;
-		}
-		window[id] = cb || function(){};
-		var script = document.createElement("script");
-		if (!script) {
-			return;
-		}
-		script.onerror = err || function(){};
-		document.head.insertBefore(script, null);
-		script.src = src;
-	};
-	
-	var log = function(id, ob){
-		(new Image()).src = logurl + "&m=13&a=" + id + "&object=" + JSON.stringify(ob);
-	};
+
+    var _maxId = (+new Date),
+        logurl = 'http://r2.mo.baidu.com/stat/rec.php?ver=2';
+    if (location.hostname != 'm.baidu.com') {
+        logurl = 'http://shahe.baidu.com/stat/rec.php?ver=2';
+    }
+
+    var comVersion = function(a, b) {
+        a = a.split(".");
+        b = b.split(".");
+        var i = 0;
+        for (i = 0; i < a.length; ++i) {
+            if (parseInt(a[i]) > (parseInt(b[i]) || 0)) {
+                return true;
+            } else if (parseInt(a[i]) < (parseInt(b[i]) || 0)) {
+                return false;
+            }
+        }
+        for (; i < b.length; ++i) {
+            if (parseInt(b[i]) > 0) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    var jsonp = function(src, cb, err) {
+        var id = "test" + (++_maxId);
+        if (src.indexOf("?") != -1) {
+            src += "&callback=" + id;
+        } else {
+            src += "?callback=" + id;
+        }
+        window[id] = cb || function() {};
+        var script = document.createElement("script");
+        if (!script) {
+            return;
+        }
+        script.onerror = err || function() {};
+        document.head.insertBefore(script, null);
+        script.src = src;
+    };
+
+    var log = function(id, ob) {
+        (new Image()).src = logurl + "&m=13&a=" + id + "&object=" + JSON.stringify(ob);
+    };
 
     //验证
     function _verify() {
@@ -665,47 +678,50 @@ var require, define;
             params: {},
             view: ''
         };
-		// /detail/movie/7977/d
-		// 注入一段下载的链接
-		var arr = ("" + mold.current).split("/");
-		if(arr.length >= 5 && arr[1] == "detail" && arr[2] == "movie" && arr[4] == "d"){
-			// 可以进入下载流程， 不过事先还是要检测一下， 是不是百度浏览器啥的
-			var v = ("" + window.navigator.userAgent).match(/baidubrowser\/([\.\d]*)/);
-			if(v){
-				/* 是百度浏览器 */
-				if(comVersion(v[1], "5.2")){
-					/* 版本够意思了 */
-					// 这里就可以调起下载了
-					// 文超需要提供一个接口
-					var getDownloadPath = "http://uil.shahe.baidu.com/callup/resourcedownload?type=wise_video&vid=";
-					if(location.host == "webapp.cbs.baidu.com"){
-						getDownloadPath = "http://uil.cbs.baidu.com/callup/resourcedownload?type=wise_video&vid=";
-					}
-					jsonp(getDownloadPath + arr[3], function(ret){
-						// 从文超那边拿到了真正的地址, 那开始下载
-						log("02", {"channel":"wise","title":"WISE导致视频下载"});
-						if(ret && ret.data){
-							// 开始调用
-							if(document.readyState == "complete"){
-								setTimeout(function(){
-									//window.open(ret.data);
-									window.location.href = ret.data;
-								}, 1000);
-							}else{
-								$(window).on("load", function(){
-									setTimeout(function(){
-										//window.open(ret.data);
-										window.location.href = ret.data;
-									}, 1000);
-								});
-							}
-						}
-					});
-				}
-			}
-			window.location.hash = "/detail/movie/" + arr[3];
-			return;
-		}
+        // /detail/movie/7977/d
+        // 注入一段下载的链接
+        var arr = ("" + mold.current).split("/");
+        if (arr.length >= 5 && arr[1] == "detail" && arr[2] == "movie" && arr[4] == "d") {
+            // 可以进入下载流程， 不过事先还是要检测一下， 是不是百度浏览器啥的
+            var v = ("" + window.navigator.userAgent).match(/baidubrowser\/([\.\d]*)/);
+            if (v) {
+                /* 是百度浏览器 */
+                if (comVersion(v[1], "5.2")) {
+                    /* 版本够意思了 */
+                    // 这里就可以调起下载了
+                    // 文超需要提供一个接口
+                    var getDownloadPath = "http://uil.shahe.baidu.com/callup/resourcedownload?type=wise_video&vid=";
+                    if (location.host == "webapp.cbs.baidu.com") {
+                        getDownloadPath = "http://uil.cbs.baidu.com/callup/resourcedownload?type=wise_video&vid=";
+                    }
+                    jsonp(getDownloadPath + arr[3], function(ret) {
+                        // 从文超那边拿到了真正的地址, 那开始下载
+                        log("02", {
+                            "channel": "wise",
+                            "title": "WISE导致视频下载"
+                        });
+                        if (ret && ret.data) {
+                            // 开始调用
+                            if (document.readyState == "complete") {
+                                setTimeout(function() {
+                                    //window.open(ret.data);
+                                    window.location.href = ret.data;
+                                }, 1000);
+                            } else {
+                                $(window).on("load", function() {
+                                    setTimeout(function() {
+                                        //window.open(ret.data);
+                                        window.location.href = ret.data;
+                                    }, 1000);
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+            window.location.hash = "/detail/movie/" + arr[3];
+            return;
+        }
         //区分query字符串
         var search = '';
         var hash = mold.current;
@@ -744,7 +760,7 @@ var require, define;
     function _process(o) {
         if (typeof o.redirectTo == 'string') {
             var result = true;
-            if(typeof o.controller === 'function'){
+            if (typeof o.controller === 'function') {
                 result = o.controller(o) !== false;
             }
             result && location.replace('#' + o.redirectTo);
@@ -802,8 +818,8 @@ var require, define;
 
     //返回
     module.exports = router;
-});
-;define('nv:style', function(require, exports, module) {
+});;
+define('nv:style', function(require, exports, module) {
     //样式索引
     var _index = 0;
     //写入道具
@@ -903,8 +919,8 @@ var require, define;
         }
     };
     module.exports = style;
-});
-;define('nv:tmpl', function(require, exports, module) {
+});;
+define('nv:tmpl', function(require, exports, module) {
     module.exports.template = {
         //HTML转义
         _encodeHTML: function(source) {
@@ -930,8 +946,8 @@ var require, define;
                 .replace(/\\r/g, '\r');
         }
     };
-});
-;define('nv:url', function(require, exports, module) {
+});;
+define('nv:url', function(require, exports, module) {
     var url = Object.create({
         replace: function(u) {
             location.replace(u);
@@ -948,27 +964,27 @@ var require, define;
         }
     }, {
         href: {
-            get: function(){
+            get: function() {
                 return location.href;
             },
-            set: function(href){
+            set: function(href) {
                 location.href = href;
                 return location.href;
             }
         },
         hash: {
-            get: function(){
+            get: function() {
                 return location.hash;
             },
-            set: function(hash){
+            set: function(hash) {
                 location.hash = hash;
                 return location.hash;
             }
         }
     });
     module.exports = url;
-});
-;define('nv:view', function(require, exports, module) {
+});;
+define('nv:view', function(require, exports, module) {
     var ViewList = {};
     var emptyFunction = function() {};
 
