@@ -1,3 +1,4 @@
+//this is test method
 ! function() {
     if (!Function.prototype.bind) {
         Function.prototype.bind = function(context) {
